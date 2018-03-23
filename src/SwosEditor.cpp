@@ -45,10 +45,11 @@ int main()
 									{"CJ0612235288", "Sensible World of Soccer v1.0 - 06/12/1994 10.50pm"},
 									{"CJ230511", "Sensible World of Soccer v1.1 - 23 / 05 / 1995 23.30pm"},
 									{"CJ100117", "Sensible World of Soccer German Release - 10/01/1995"},
-									{"CJ011211", "Sensible World of Soccer 95/96 - 01/12/1995 11.35"},
+									{"CJ011211458A", "Sensible World of Soccer 95/96 - 01/12/1995 11.35"},
 									{"CJ180421", "Sensible World of Soccer 95 / 96 Euro Update - 18 / 04 / 1996 21.50"},
 									{"CJ061114", "Sensible World of Soccer 96/97 - 06/11/1996 13.55"},
 									{"CJ061114", "Sensible World of Soccer PC Version - 06/11/1996 13.55"} 
+	
 	};
 
 
@@ -58,8 +59,8 @@ int main()
 
 		NUM_PLAYERS_POS,	    // Number of players in the team
 		TEAM_NAME_POS,			// Team Name
-		MGR_FORENAME_POS,		// , #   - Managers forename
-		MGR_SURNAME_POS,		// , #   - Managers Surname
+		MGR_FORENAME_POS,		// #   - Managers forename
+		MGR_SURNAME_POS,		// #   - Managers Surname
 		MGR_FULLNAME_POS,		// #  - Managers Full Name(Yes it is stored twice!!)
 		PLR1_POSITION_POS,		// #  - Position of the first player in the file.This is then 38 bytes of data
 		MONEY_POS,				// Money
@@ -86,11 +87,10 @@ int main()
 //	struct Swos_Main_Offsets swosVers[VERSIONS];
 
 	// Version identifiers and memory locations
-	//string cjvers[8]				  = { "CJ281112", "CJ0612235288", "CJ230511", "CJ100117", "CJ011211", "CJ180421", "CJ061114", "CJ061114" };
-
+	
 	// File path & name
 
-	std::string file = "E://ORIGINAL_EditedMon.CAR";
+	std::string file = "E://9596.CAR";
 	
 	// Get filesize for buffer creation
 	// NEED TO MAKE THIS A LOOP WHEN A GUI IS CREATED.
@@ -116,9 +116,7 @@ int main()
 	// Load the file to our buffer
 	loadfile(file, buffer, &filelen);					// Load the actual variable with the memlocation of the buffer
 	
-	std::cout << std::endl << "File length in main() is: " << filelen << std::endl << std::endl;
 	
-
 	// Here is where we will check the version numbers and return which version we are using
 
 	std::string CJVer = "";
@@ -133,11 +131,33 @@ int main()
 		CJVer = charToBuffer(buffer, swosOffsets[i][CJOFFSET], 0, 0x00);     // Offsets are located at array [x][9] (no buffer lenght, $0x00 terminating character)
 		if (getversion(CJVer, cjvers, 2, i)) {
 			std::cout << " matches " << cjvers[i][0] << " and is the " << cjvers[i][1] << std::endl;
+			int swos_version = i;
 
 			// Allocate the offsets to the main_offsets_structure
+			swosoffsets.num_players_pos = swosOffsets[swos_version][NUM_PLAYERS_POS];
+			swosoffsets.team_name_pos = swosOffsets[swos_version][TEAM_NAME_POS];
+			swosoffsets.mgr_forename_pos = swosOffsets[swos_version][MGR_FORENAME_POS];
+			swosoffsets.mgr_surname_pos = swosOffsets[swos_version][MGR_SURNAME_POS];
+			swosoffsets.mgr_fullname_pos = swosOffsets[swos_version][MGR_FULLNAME_POS];
+			swosoffsets.plr1_Position_pos = swosOffsets[swos_version][PLR1_POSITION_POS];
+			swosoffsets.money_pos = swosOffsets[swos_version][MONEY_POS];
+			swosoffsets.tact_pos = swosOffsets[swos_version][TACT_POS];
+			swosoffsets.first_team = swosOffsets[swos_version][FIRST_TEAM];
+			swosoffsets.CJOffset = swosOffsets[swos_version][CJOFFSET];
+			
+			unsigned int money = buffToInteger(buffer, swosoffsets.money_pos, 3);
+			unsigned int numplrs = buffToInteger(buffer, swosoffsets.num_players_pos, 0);
+			std::string teamname = charToBuffer(buffer, swosoffsets.first_team, 0, 0x00);
+			std::cout << "number of players in team position is: " << swosoffsets.num_players_pos << std::endl;
+			std::cout << "First team in the file is: " << teamname << std::endl;
+			std::cout << "There are: " << numplrs << " players in the team" << std::endl;
+
+
+			std::cout << "Team money is: " << money << std::endl;
+			break;
 		}
 		else {
-			std::cout << "Does not match " << cjvers[i][0] << std::endl;
+			//std::cout << "Does not match " << cjvers[i][0] << std::endl;
 		}
 
 
