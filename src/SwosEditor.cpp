@@ -151,6 +151,7 @@ int main()
 			std::cout << "number of players in team position is: " << swosoffsets.num_players_pos << std::endl;
 			std::cout << "First team in the file is: " << teamname << std::endl;
 			std::cout << "There are: " << numplrs << " players in the team" << std::endl;
+			std::cout << "There are a total of " << (filelen - swosoffsets.first_team) / 684 << " teams in this save file" << std::endl;
 
 
 			std::cout << "Team money is: " << money << std::endl;
